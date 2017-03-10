@@ -1,0 +1,24 @@
+{
+  "name": "wikistack",
+  "version": "1.0.0",
+  "description": "wikistack",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon -e html,js,css app.js"
+  },
+  "author": "Kate Caldwell",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.17.1",
+    "express": "^4.15.2",
+    "nunjucks": "^3.0.0",
+    "pg": "^6.1.4",
+    "pg-hstore": "^2.3.2",
+    "sequelize": "^3.30.2",
+    "volleyball": "^1.4.1"
+  },
+  "devDependencies": {
+    "nodemon": "^1.11.0"
+  }
+}
