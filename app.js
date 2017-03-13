@@ -22,9 +22,9 @@ app.use('/wiki', wikiRouter);
 app.use(express.static(path.join(__dirname, '/public')));
 
 
-models.User.sync({})
+models.User.sync({ force: true })
 .then(function () {
-    return models.Page.sync({})
+    return models.Page.sync({ force: true })
 })
 .then(function(){
     var server = app.listen(1337, function() {
