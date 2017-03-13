@@ -1,26 +1,30 @@
 const express = require('express');
-const route = express.Router();
+const router = express.Router();
+const models = require('../models');
+var Page = models.Page; 
+var User = models.User; 
 
 
 //var client = require('../db');
 
-route.get('/', function(req, res, next){
-	//res.send('In Get /')
-	res.redirect('/');
+router.get('/', function(req, res, next){
+	res.send('In Get /')
+	//res.redirect('/');
 	next();
 });
 
-route.post('/', function(req, res, next){
-	//res.send('In post /');
-	console.log(req.body);
-	res.json(req.body);
-
-
+router.post('/', function(req, res, next) {
+  var page = Page.build({
+    title: req.body.title,
+    content: req.body.content
+  })
+	page.save();
+	res.json(page); 
 });
 
-route.get('/add', function(req, res, next){
+router.get('/add', function(req, res, next){
 	//res.send('in get /add');
 	res.render('addpage')
 });
 
-module.exports = route;
+module.exports = router;
