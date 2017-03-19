@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const Promise = require('bluebird')
 const models = require('../models');
 var Page = models.Page; 
 var User = models.User; 
@@ -10,76 +11,57 @@ var User = models.User;
 router.get('/', function(req, res, next){
 	return Page.findAll({})
 	.then(function(allPages) {
-		var pagesArr = allPages.map(function(elem) {
-			return {
-				title: elem.dataValues.title,
-				urlTitle: elem.dataValues.urlTitle
-			}
+			res.render('index', {pages: allPages})
 		})
-		// console.log(allPages[0].dataValues)
-		res.render('index', {pages: pagesArr})
-	})
-	
-	
-	
-	res.send('In Get /')
-	//res.redirect('/');
-	next();
+	.catch(next)
 });
 
 router.post('/', function(req, res, next) {
-//adding pages and users together isn't working yet
-	return User.findOne({
-		where: {
-			name: req.body.name,
-			email: req.body.email
-		}
-	}).then(function(userToAdd) {
-		if(!userToAdd) {
-			var user = User.build({
-				name: req.body.name,
-				email: req.body.email
+	User.findOrCreate({
+            where: {
+                name: req.body.name,
+                email: req.body.email
+            }
+        })
+        .spread(function(user, createdPageBool) {
+            return Page.create({
+				title: req.body.title,
+				content: req.body.content,
+				status: req.body.status
+			}).then(function(page) {
+				return page.setAuthor(user)
 			})
-			user.save()
-			userToAdd = user;
-		}
-		return userToAdd 
-	}).then(function(userToAdd) {
-		var page = Page.build({
-    		title: req.body.title,
-    		content: req.body.content,
-			authorId: userToAdd.id
-  		})
-		return page.save()
-	}).then(function(savedPage){
-		res.redirect(savedPage.route); 
-	})
-	
-});
+		})
+		.then(function (page) {
+				res.redirect(page.route)
+        })
+		.catch(next);
+})
 
 router.get('/add', function(req, res, next){
-	//res.send('in get /add');
 	res.render('addpage')
 });
 
-router.get('/:page', function(req, res, next){
-	var page = req.params.page;
-	return Page.findAll({
+router.get('/:url', function(req, res, next){
+	var url = req.params.url;
+	Page.findOne({
 		where: {
-			urlTitle: page
-		}
+			urlTitle: url
+		}, include : [
+			{model: User, as: 'author'}
+		]
 	})
-	.then(function(retPage){
+	.then(function(page){
+		if (!page) {
+			return next(new Error('That page was not found'))
+		}
 		res.render('wikipage',{
-			title: retPage[0].title,
-			content: retPage[0].content
+			page: page,
+			title: page.title,
+			content: page.content
 		});
 	})
 	.catch(next);
-
-
-	//res.render('wikipage');
-
 });
 
 module.exports = router;

@@ -8,25 +8,15 @@ var Page = db.define('page', {
     	type: Sequelize.STRING,
     	allowNull: false
     },
-
     urlTitle: {
     	type: Sequelize.STRING,
     	allowNull: false
     },
-
     content: {
     	type: Sequelize.TEXT,
     	allowNull: false
     	},
-
     status: Sequelize.ENUM('open', 'closed')
-
-    // date: {
-    //     type: Sequelize.DATE,
-    //     //defaultValue:  
-    // },
-
-   
 }, {
     hooks: {
         beforeValidate: function(page, options) {
@@ -57,10 +47,11 @@ var User = db.define('user', {
 
 
 
-Page.belongsTo(User, { as: 'author' });
+Page.belongsTo(User, { as: 'author' }); 
 
 
 module.exports = {
+    db: db,
     Page: Page,
     User: User
-}
+};
